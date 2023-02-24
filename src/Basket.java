@@ -1,11 +1,9 @@
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.Arrays;
 import java.util.Scanner;
 
-public class Basket {
+public class Basket implements Serializable {
+    private static final long serialVersionUID = 1L;
     private static String[] products;
     private static int[] prices;
 
@@ -53,7 +51,7 @@ public class Basket {
             System.out.println(ex.getMessage());
         }
     }
-    public static Basket loadFromTextFile(File file) {
+     static Basket loadFromTextFile(File file) {
         Basket basket = new Basket(products, prices);
         try (FileReader reader = new FileReader("cart.txt")){
             Scanner scanner = new Scanner(reader);
@@ -73,4 +71,25 @@ public class Basket {
 
         return basket;
     }
+
+    public void saveBin(File file, Basket basket) {
+        try (FileOutputStream fos = new FileOutputStream(file);
+            ObjectOutputStream oos = new ObjectOutputStream(fos)){
+                oos.writeObject(basket);
+            }  catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    static Basket loadFromBinFile(File file) {
+        Basket basket = null;
+        try (FileInputStream fis = new FileInputStream(file);
+        ObjectInputStream ois = new ObjectInputStream(fis)){
+            basket = (Basket) ois.readObject();
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        return basket;
+    }
+
 }

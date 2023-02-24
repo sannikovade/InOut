@@ -13,10 +13,10 @@ public class Main {
         }
 
         Basket basket = new Basket(products,prices);
-        File file = new File("./cart.txt");
+        File file = new File("./basket.bin");
 
         if(file.exists()){
-            basket = Basket.loadFromTextFile(file);
+            basket = Basket.loadFromBinFile(file);
         }
 
         while (true) {
@@ -32,7 +32,7 @@ public class Main {
             int productNumber = Integer.parseInt(parts[0]) - 1;
             int productCount = Integer.parseInt(parts[1]);
             basket.addToCart(productNumber, productCount);
-            basket.saveTxt(file);
+            basket.saveBin(file, basket);
 
         }
         basket.printCart();
