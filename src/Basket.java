@@ -22,14 +22,34 @@ public class Basket {
         isFilled = new boolean[products.length];
     }
 
+    static Basket loadFromTextFile(File file) {
+        Basket basket = new Basket(products, prices);
+        try (FileReader reader = new FileReader("cart.txt")) {
+            Scanner scanner = new Scanner(reader);
+            while (scanner.hasNextLine()) {
+                String[] input = scanner.nextLine().split(" ");
+                in = Arrays.stream(input)
+                        .mapToInt(Integer::parseInt)
+                        .toArray();
+            }
 
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
+        for (int i = 0; i < in.length; i++) {
+            basket.addToCart(i, in[i]);
+        }
 
-    public void addToCart(int productNum, int amount){
+        return basket;
+    }
+
+    public void addToCart(int productNum, int amount) {
         amountOfProducts[productNum] += amount;
         costOfProducts[productNum] += (amount * prices[productNum]);
         isFilled[productNum] = true;
     }
-    public void printCart(){
+
+    public void printCart() {
         System.out.println("Your cart:");
         for (int i = 0; i < products.length; i++) {
             if (isFilled[i]) {
@@ -37,8 +57,8 @@ public class Basket {
             }
         }
         int total = 0;
-        for (int prodCost:
-             costOfProducts) {
+        for (int prodCost :
+                costOfProducts) {
             total += prodCost;
         }
         System.out.println("Total: " + total + " RUB");
@@ -52,25 +72,5 @@ public class Basket {
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
-    }
-    public static Basket loadFromTextFile(File file) {
-        Basket basket = new Basket(products, prices);
-        try (FileReader reader = new FileReader("cart.txt")){
-            Scanner scanner = new Scanner(reader);
-            while (scanner.hasNextLine()){
-                String[] input = scanner.nextLine().split(" ");
-                in = Arrays.stream(input)
-                        .mapToInt(Integer::parseInt)
-                        .toArray();
-            }
-
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        }
-        for (int i = 0; i < in.length; i++) {
-            basket.addToCart(i,in[i]);
-        }
-
-        return basket;
     }
 }

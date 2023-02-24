@@ -12,10 +12,10 @@ public class Main {
             System.out.println((i + 1) + " " + products[i] + " " + prices[i] + " RUB/1pc");
         }
 
-        Basket basket = new Basket(products,prices);
+        Basket basket = new Basket(products, prices);
         File file = new File("./cart.txt");
 
-        if(file.exists()){
+        if (file.exists()) {
             basket = Basket.loadFromTextFile(file);
         }
 
