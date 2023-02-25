@@ -1,18 +1,17 @@
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Scanner;
 
 public class Basket {
-    private static String[] products;
-    private static int[] prices;
+    protected String[] products;
+    protected int[] prices;
 
-    private static int[] amountOfProducts;
-    private static int[] costOfProducts;
-    private static boolean isFilled[];
-    private static int[] in;
+    protected int[] amountOfProducts;
+    protected int[] costOfProducts;
+    protected boolean isFilled[];
 
     public Basket(String[] products, int[] prices) {
         this.products = products;
@@ -23,24 +22,31 @@ public class Basket {
     }
 
     static Basket loadFromTextFile(File file) {
-        Basket basket = new Basket(products, prices);
         try (FileReader reader = new FileReader("cart.txt")) {
             Scanner scanner = new Scanner(reader);
             while (scanner.hasNextLine()) {
-                String[] input = scanner.nextLine().split(" ");
-                in = Arrays.stream(input)
+                String[] inputProducts = scanner.nextLine().split(" ");
+
+                String[] inPrices = scanner.nextLine().split(" ");
+                int[] inputPrices = Arrays.stream(inPrices)
                         .mapToInt(Integer::parseInt)
                         .toArray();
+
+                String[] inAmount = scanner.nextLine().split(" ");
+                int[] inputAmount = Arrays.stream(inAmount)
+                        .mapToInt(Integer::parseInt)
+                        .toArray();
+                Basket basket = new Basket(inputProducts, inputPrices);
+                for (int i = 0; i < inputAmount.length; i++) {
+                    basket.addToCart(i, inputAmount[i]);
+                }
+                return basket;
             }
 
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
-        for (int i = 0; i < in.length; i++) {
-            basket.addToCart(i, in[i]);
-        }
-
-        return basket;
+        return null;
     }
 
     public void addToCart(int productNum, int amount) {
@@ -65,7 +71,15 @@ public class Basket {
     }
 
     public void saveTxt(File textFile) throws IOException {
-        try (FileWriter writer = new FileWriter(textFile)) {
+        try (PrintWriter writer = new PrintWriter(textFile)) {
+            for (String product : products) {
+                writer.print(product + " ");
+            }
+            writer.println();
+            for (int price : prices) {
+                writer.print(price + " ");
+            }
+            writer.println();
             for (int i : amountOfProducts) {
                 writer.write(i + " ");
             }
