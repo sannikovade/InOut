@@ -6,3 +6,5 @@ out
 target
 #файлы корзин
 cart.txt
+basket.json
+log.csv

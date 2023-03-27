@@ -1,6 +1,15 @@
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
+
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -13,10 +22,24 @@ public class Main {
         }
 
         Basket basket = new Basket(products, prices);
-        File file = new File("./cart.txt");
+        ClientLog clientLog = new ClientLog();
+        File fileCSV = new File("./log.csv");
+        File fileJSON = new File("./basket.json");
 
-        if (file.exists()) {
-            basket = Basket.loadFromTextFile(file);
+
+        if (fileJSON.exists()) {
+            JSONParser parser = new JSONParser();
+            try {
+                Object obj = parser.parse(new FileReader(fileJSON));
+                JSONObject jsonObject = (JSONObject) obj;
+                String jsonText = String.valueOf(jsonObject);
+
+                GsonBuilder builder = new GsonBuilder();
+                Gson gson = builder.create();
+                basket = gson.fromJson(jsonText, Basket.class);
+            } catch (IOException | ParseException e) {
+                e.getMessage();
+            }
         }
 
         while (true) {
@@ -26,15 +49,24 @@ public class Main {
             Scanner scanner = new Scanner(System.in);
             String input = scanner.nextLine();
             if (input.equals("end")) {
+                clientLog.exportAsCSV(fileCSV);
                 break;
             }
             String[] parts = input.split(" ");
             int productNumber = Integer.parseInt(parts[0]) - 1;
             int productCount = Integer.parseInt(parts[1]);
             basket.addToCart(productNumber, productCount);
-            basket.saveTxt(file);
+            clientLog.log(productNumber + 1, productCount);
+
+            try (FileWriter fileWriter = new FileWriter(fileJSON)) {
+                GsonBuilder builder = new GsonBuilder();
+                Gson gson = builder.create();
+                fileWriter.write(gson.toJson(basket));
+                fileWriter.flush();
+            }
 
         }
         basket.printCart();
+
     }
 }
